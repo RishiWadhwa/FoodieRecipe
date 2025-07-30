@@ -1,73 +1,94 @@
-import { View, Text, Pressable, Image, StyleSheet, FlatList, TouchableOpacity } from "react-native";
-import React from "react";
-import {widthPercentageToDP as wp, heightPercentageToDP as hp,} from "react-native-responsive-screen";
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  Image,
+  Pressable,
+  StyleSheet,
+  TouchableOpacity,
+} from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import { Ionicons } from "@expo/vector-icons";
 
-export default function Recipe({ categories, foods }) {
+export default function RecipeDetail(props) {
   const navigation = useNavigation();
+  const recipe = props.route.params.recipe;
 
-  const renderItem = ({ item, index }) => (
-<ArticleCard item={item} index={index} navigation={navigation} />
-  );
+  const [isFavorite, setIsFavorite] = useState(false);
+
+  const toggleFavorite = () => {
+    setIsFavorite((prev) => !prev);
+  };
 
   return (
-    <View style={styles.container}>
-      <View testID="recipesDisplay">
-            
+    <View>
+      <View testID="imageContainer">
+        <Image
+          source={{ uri: recipe.recipeImage }}
+          style={styles.recipeImage}
+        />
+      </View>
+
+      <View>
+        <Pressable onPress={() => navigation.goBack()}>
+          <Text>Back</Text>
+        </Pressable>
+        <Pressable onPress={toggleFavorite}>
+          <Ionicons
+            name={isFavorite ? "heart" : "heart-outline"}
+            size={24}
+            color="red"
+          />
+        </Pressable>
+      </View>
+
+      <View testID="recipeTitle">
+        <Text>{recipe.name}</Text>
+      </View>
+
+      <View testID="recipeCategory">
+        <Text>{recipe.category}</Text>
+      </View>
+
+      <View testID="miscContainer">
+        <Ionicons name="time-outline" size={20} />
+        <Ionicons name="restaurant-outline" size={20} />
+        <Ionicons name="flame-outline" size={20} />
+        <Ionicons name="list-outline" size={20} />
+      </View>
+
+      <View testID="sectionContainer">
+        <Text>Ingredients</Text>
+        <View testID="ingredientsList">
+          {recipe.ingredients.map((ingredient, index) => (
+            <View key={index}>
+              <Text>{`${ingredient.name} - ${ingredient.measure}`}</Text>
+            </View>
+          ))}
+        </View>
+
+        <Text style={styles.sectionTitle}>Instructions</Text>
+        <Text style={styles.instructionsText}>
+          {recipe.recipeInstructions}
+        </Text>
       </View>
     </View>
   );
 }
 
-const ArticleCard = ({ item, index, navigation }) => {
-  return (
-    <View
-      style={[styles.cardContainer, { paddingLeft: 20, paddingRight: 15}]} testID="articleDisplay"
-    >
-   
-    </View>
-  );
-};
-
 const styles = StyleSheet.create({
-  container: {
-    marginHorizontal: wp(4), // mx-4 equivalent
-    marginTop: hp(2),
-  },
-  title: {
-    fontSize: hp(3),
-    fontWeight: "600", // font-semibold
-    color: "#52525B", // text-neutral-600
-    marginBottom: hp(1.5),
-  },
-  loading: {
-    marginTop: hp(20),
-  },
-  cardContainer: {
-    justifyContent: "center",
-    marginBottom: hp(1.5),
-    flex: 1, // Allows cards to grow and fill space evenly
-  },
-  articleImage: {
+  recipeImage: {
     width: "100%",
-   
-    borderRadius: 35,
-    backgroundColor: "rgba(0, 0, 0, 0.05)", // bg-black/5
+    height: 200,
+    borderRadius: 10,
   },
-  articleText: {
-    fontSize: hp(1.5),
-    fontWeight: "600", // font-semibold
-    color: "#52525B", // text-neutral-600
-    marginLeft: wp(2),
-    marginTop: hp(0.5),
+  sectionTitle: {
+    fontWeight: "bold",
+    fontSize: 16,
+    marginTop: 10,
   },
-  articleDescription: {
-    fontSize: hp(1.2),
-    color: "#6B7280", // gray-500
-    marginLeft: wp(2),
-    marginTop: hp(0.5),
-  },
-  row: {
-    justifyContent: "space-between", // Align columns evenly
+  instructionsText: {
+    marginTop: 5,
+    fontSize: 14,
   },
 });
